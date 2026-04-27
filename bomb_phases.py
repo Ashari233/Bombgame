@@ -82,7 +82,13 @@ class Lcd(Frame):
         if (RPi):
             self._timer.pause()
 
+    # TODO place a gui element briefly on the screen that tells the user that they have received a strike
+    def strike_display(self):
+        pass
+
     # setup the conclusion GUI (explosion/defusion)
+    # TODO in here we will add the explosion gif, and then a subsequent failure screen.
+    # TODO in here we will also add the time travel gif and then a subsequent success screen.
     def conclusion(self, success=False):
         # destroy/clear widgets that are no longer needed
         self._lscroll["text"] = ""
