@@ -43,24 +43,142 @@ class Lcd(Frame):
 
     # sets up the LCD GUI
     def setup(self):
-        # the timer
-        self._ltimer = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Time left: ")
-        self._ltimer.grid(row=1, column=0, columnspan=3, sticky=W)
-        # the keypad passphrase
-        self._lkeypad = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Keypad phase: ")
-        self._lkeypad.grid(row=2, column=0, columnspan=3, sticky=W)
-        # the jumper wires status
-        self._lwires = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Wires phase: ")
-        self._lwires.grid(row=3, column=0, columnspan=3, sticky=W)
-        # the pushbutton status
-        self._lbutton = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Button phase: ")
-        self._lbutton.grid(row=4, column=0, columnspan=3, sticky=W)
-        # the toggle switches status
-        self._ltoggles = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Toggles phase: ")
-        self._ltoggles.grid(row=5, column=0, columnspan=2, sticky=W)
-        # the strikes left
-        self._lstrikes = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Strikes left: ")
-        self._lstrikes.grid(row=5, column=2, sticky=W)
+        # Centering Frame for phase statuses
+        self.centerFrame = Frame(
+            self,
+            relief="groove",
+            bd=1
+        )
+        self.centerFrame.place(x=30, y=170, width=740, height=200)
+
+        # Strikes Indicator
+        self.STRIKES = Label(
+            self,
+            text="STRIKES: 3",
+            fg="#000000",
+            font=("Courier New", 16),
+            anchor="center"
+        )
+        self.STRIKES.place(x=680, y=10, width=100, height=40)
+
+        # Time Machine Title Text
+        self.timeMachineTitle = Label(
+            self,
+            text="TIME MACHINE",
+            fg="#000000",
+            font=("Courier New", 27),
+            anchor="center"
+        )
+        self.timeMachineTitle.place(x=190, y=30, width=420, height=50)
+
+        # Time Machine Maintenance Mode Subtitle Text
+        self.timeMachineSubtitle = Label(
+            self,
+            text="MAINTENANCE MODE",
+            fg="#000000",
+            font=("Courier New", 28),
+            anchor="center"
+        )
+        self.timeMachineSubtitle.place(x=190, y=70, width=420, height=50)
+
+        # Title text for wires phase
+        self.wiresTitleText = Label(
+            self,
+            text="WIRING",
+            fg="#000000",
+            font=("Courier New", 23),
+            anchor="center"
+        )
+        self.wiresTitleText.place(x=50, y=180, width=200, height=60)
+
+        # Status text for wires phase
+        self.wiresStatusText = Label(
+            self,
+            text="OPERATIONAL",
+            fg="red",
+            font=("Courier New", 23),
+            anchor="center"
+        )
+        self.wiresStatusText.place(x=50, y=260, width=200, height=60)
+
+        # Title text for button phase
+        self.buttonTitleText = Label(
+            self,
+            text="ACCESS CODE",
+            fg="#000000",
+            font=("Courier New", 23),
+            anchor="center"
+        )
+        self.buttonTitleText.place(x=300, y=180, width=200, height=60)
+
+        # Status text for button phase
+        self.buttonStatusText = Label(
+            self,
+            text="DENIED",
+            fg="red",
+            font=("Courier New", 23),
+            anchor="center"
+        )
+        self.buttonStatusText.place(x=300, y=260, width=200, height=60)
+
+        # Title text for code pad phase
+        self.codePadTitleText = Label(
+            self,
+            text="TIME CALIBR.",
+            fg="#000000",
+            font=("Courier New", 23),
+            anchor="center"
+        )
+        self.codePadTitleText.place(x=550, y=180, width=200, height=60)
+
+        # Status text for code pad phase
+        self.codePadStatusText = tk.Label(
+            self,
+            text="COMPLETED",
+            fg="red",
+            font=("Courier New", 23),
+            anchor="center"
+        )
+        self.codePadStatusText.place(x=550, y=260, width=200, height=60)
+
+        # Title text for toggles phase
+        self.togglesTitleText = Label(
+            self,
+            text="DESTINATION YEAR:",
+            fg="#000000",
+            font=("Courier New", 24),
+            anchor="center"
+        )
+        self.togglesTitleText.place(x=190, y=400, width=420, height=50)
+
+        # Status text for toggles phase
+        self.togglesStatusText = Label(
+            self,
+            text="0 CE",
+            fg="#000000",
+            font=("Courier New", 24),
+            anchor="center"
+        )
+        self.togglesStatusText.place(x=190, y=430, width=420, height=50)
+        
+        # # the timer
+        # self._ltimer = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Time left: ")
+        # self._ltimer.grid(row=1, column=0, columnspan=3, sticky=W)
+        # # the keypad passphrase
+        # self._lkeypad = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Keypad phase: ")
+        # self._lkeypad.grid(row=2, column=0, columnspan=3, sticky=W)
+        # # the jumper wires status
+        # self._lwires = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Wires phase: ")
+        # self._lwires.grid(row=3, column=0, columnspan=3, sticky=W)
+        # # the pushbutton status
+        # self._lbutton = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Button phase: ")
+        # self._lbutton.grid(row=4, column=0, columnspan=3, sticky=W)
+        # # the toggle switches status
+        # self._ltoggles = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Toggles phase: ")
+        # self._ltoggles.grid(row=5, column=0, columnspan=2, sticky=W)
+        # # the strikes left
+        # self._lstrikes = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Strikes left: ")
+        # self._lstrikes.grid(row=5, column=2, sticky=W)
         if (SHOW_BUTTONS):
             # the pause button (pauses the timer)
             self._bpause = tkinter.Button(self, bg="red", fg="white", font=("Courier New", 18), text="Pause", anchor=CENTER, command=self.pause)
@@ -92,12 +210,12 @@ class Lcd(Frame):
     def conclusion(self, success=False):
         # destroy/clear widgets that are no longer needed
         self._lscroll["text"] = ""
-        self._ltimer.destroy()
-        self._lkeypad.destroy()
-        self._lwires.destroy()
-        self._lbutton.destroy()
-        self._ltoggles.destroy()
-        self._lstrikes.destroy()
+        # self._ltimer.destroy()
+        # self._lkeypad.destroy()
+        # self._lwires.destroy()
+        # self._lbutton.destroy()
+        # self._ltoggles.destroy()
+        # self._lstrikes.destroy()
         if (SHOW_BUTTONS):
             self._bpause.destroy()
             self._bquit.destroy()
