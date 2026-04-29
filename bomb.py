@@ -50,6 +50,7 @@ def setup_phases():
     toggles.start()
 
 # checks the phase threads
+# TODO update checks so that they work with the new UI
 def check_phases():
     global active_phases
     
