@@ -6,14 +6,14 @@
 
 # constants
 DEBUG = False        # debug mode?
-RPi = False           # is this running on the RPi?
+RPi = True           # is this running on the RPi?
 SHOW_BUTTONS = False # show the Pause and Quit buttons on the main LCD GUI?
-COUNTDOWN = 300      # the initial bomb countdown value (seconds)
-NUM_STRIKES = 5      # the total strikes allowed before the bomb "explodes"
+COUNTDOWN = 900      # the initial bomb countdown value (seconds)
+NUM_STRIKES = 3      # the total strikes allowed before the bomb "explodes"
 NUM_PHASES = 4       # the total number of initial active bomb phases
 
 # imports
-from random import randint, shuffle, choice
+from random import randint, shuffle, choice, sample
 from string import ascii_uppercase
 if (RPi):
     import board
@@ -86,52 +86,48 @@ if (RPi):
 ###########
 # functions to generate targets for toggles/wires/keypad/Button
 ###########
-def genSerial():
-    # Create your own logic of making a serial number (if needed)
-    # TODO
-    return "B026DES"
+# def genSerial():
+#     # Create your own logic of making a serial number (if needed)
+#     # TODO
+#     return "B026DES"
 
 def genTogglesTarget():
-    # Create your own logic of making a target number for toggles
-    # TODO
-    return 20
+    # Actual target will be "2026" after mathematical conversion
+    # 1 is - 1013, 2 is + 338, 3 is *2, 4 is absolute value
+    return "1011"
 
 def genWiresTarget():
-    # Create your own logic of making a target number for wires
-    # TODO
-    return 5
+    return "11101"
+
 # generates the keypad combination from a keyword and rotation key
 def genKeypadTarget():
-    # Create your own logic of making a keypad combination number if needed
-    # TODO
-    return "26863"
+    return ["1776", "1945"]
 
 # generate the color of the pushbutton (which determines how to defuse the phase)
-button_color = choice(["R", "G", "B"])
+button_color = sample(["R", "G", "B"], 3) # shuffles the possible combinations ex: ["B","R","G"]. 6 possible permutations
 
 def genButtonTarget():
     # TODO
     global button_color
     # Create your own logic of making a Button target
     # appropriately set the target (R is None)
-    b_target = None
-    # G is the first numeric digit in the serial number
-    if (button_color == "G"):
-        b_target = [ n for n in serial if n.isdigit() ][0]
-    # B is the last numeric digit in the serial number
-    elif (button_color == "B"):
-        b_target = [ n for n in serial if n.isdigit() ][-1]
-
-    return b_target
+#     b_target = None
+#     # G is the first numeric digit in the serial number
+#     if (button_color == "G"):
+# #         b_target = [ n for n in serial if n.isdigit() ][0]
+#     # B is the last numeric digit in the serial number
+#     elif (button_color == "B"):
+# #         b_target = [ n for n in serial if n.isdigit() ][-1]
+            
+    return 2
 
 ###############################
-serial = genSerial()
+# serial = genSerial()
 toggles_target = genTogglesTarget()
 wires_target = genWiresTarget()
 keypad_target = genKeypadTarget()
 button_target = genButtonTarget()
 
 # set the bomb's LCD bootup text
-boot_text = f"*Add your own text here specific to your bomb*\n"\
-            f"*Serial number: {serial}\n"\
+boot_text = "Yay!"
             
