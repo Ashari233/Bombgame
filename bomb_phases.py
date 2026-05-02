@@ -10,7 +10,7 @@ from bomb_configs import *
 from tkinter import *
 import tkinter
 from threading import Thread
-from time import sleep
+from time import sleep, time
 import os
 import sys
 
@@ -20,7 +20,7 @@ import sys
 # the LCD display GUI
 class Lcd(Frame):
     def __init__(self, window):
-        super().__init__(window, bg="black")
+        super().__init__(window, bg="#0077D6")
         # make the GUI fullscreen
         window.attributes("-fullscreen", True)
         # we need to know about the timer (7-segment display) to be able to pause/unpause it
@@ -29,6 +29,8 @@ class Lcd(Frame):
         self._button = None
         # setup the initial "boot" GUI
         self.setupBoot()
+        # store the strike popup object
+        self._strikePopup = None
 
     # sets up the LCD "boot" GUI
     def setupBoot(self):
@@ -43,24 +45,155 @@ class Lcd(Frame):
 
     # sets up the LCD GUI
     def setup(self):
-        # the timer
-        self._ltimer = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Time left: ")
-        self._ltimer.grid(row=1, column=0, columnspan=3, sticky=W)
-        # the keypad passphrase
-        self._lkeypad = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Keypad phase: ")
-        self._lkeypad.grid(row=2, column=0, columnspan=3, sticky=W)
-        # the jumper wires status
-        self._lwires = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Wires phase: ")
-        self._lwires.grid(row=3, column=0, columnspan=3, sticky=W)
-        # the pushbutton status
-        self._lbutton = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Button phase: ")
-        self._lbutton.grid(row=4, column=0, columnspan=3, sticky=W)
-        # the toggle switches status
-        self._ltoggles = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Toggles phase: ")
-        self._ltoggles.grid(row=5, column=0, columnspan=2, sticky=W)
-        # the strikes left
-        self._lstrikes = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Strikes left: ")
-        self._lstrikes.grid(row=5, column=2, sticky=W)
+        # Assistance in design received from https://pydesigner.qzz.io/
+        # Centering Frame for phase statuses
+        self.centerFrame = Frame(
+            self,
+            relief="groove",
+            bg="#0077D6",
+            bd=1
+        )
+        self.centerFrame.place(x=20, y=90, width=760, height=190)
+
+        # Strikes Indicator
+        self.STRIKES = Label(
+            self,
+            text="STRIKES: 3",
+            fg="#000000",
+            bg="#0077D6",
+            font=("Courier New", 16),
+            anchor="center"
+        )
+        self.STRIKES.place(x=620, y=10, width=160, height=40)
+
+        # Time Machine Title Text
+        self.timeMachineTitle = Label(
+            self,
+            text="TIME MACHINE",
+            fg="#000000",
+            bg="#0077D6",
+            font=("Courier New", 27),
+            anchor="center"
+        )
+        self.timeMachineTitle.place(x=190, y=10, width=420, height=50)
+
+        # Time Machine Maintenance Mode Subtitle Text
+        self.timeMachineSubtitle = Label(
+            self,
+            text="MAINTENANCE MODE",
+            fg="#000000",
+            bg="#0077D6",
+            font=("Courier New", 28),
+            anchor="center"
+        )
+        self.timeMachineSubtitle.place(x=190, y=50, width=420, height=50)
+
+        # Title text for wires phase
+        self.wiresTitleText = Label(
+            self,
+            text="WIRING",
+            fg="#000000",
+            bg="#0077D6",
+            font=("Courier New", 23),
+            anchor="center"
+        )
+        self.wiresTitleText.place(x=40, y=120, width=220, height=60)
+
+        # Status text for wires phase
+        self.wiresStatusText = Label(
+            self,
+            text="OPERATIONAL",
+            fg="red",
+            bg="#0077D6",
+            font=("Courier New", 23),
+            anchor="center"
+        )
+        self.wiresStatusText.place(x=50, y=200, width=200, height=60)
+
+        # Title text for button phase
+        self.buttonTitleText = Label(
+            self,
+            text="ACCESS CODE",
+            fg="#000000",
+            bg="#0077D6",
+            font=("Courier New", 23),
+            anchor="center"
+        )
+        self.buttonTitleText.place(x=260, y=120, width=270, height=60)
+
+        # Status text for button phase
+        self.buttonStatusText = Label(
+            self,
+            text="DENIED",
+            fg="red",
+            bg="#0077D6",
+            font=("Courier New", 23),
+            anchor="center"
+        )
+        self.buttonStatusText.place(x=300, y=200, width=200, height=60)
+
+        # Title text for code pad phase
+        self.codePadTitleText = Label(
+            self,
+            text="TIME CALIBR.",
+            fg="#000000",
+            bg="#0077D6",
+            font=("Courier New", 23),
+            anchor="center"
+        )
+        self.codePadTitleText.place(x=540, y=120, width=220, height=60)
+
+        # Status text for code pad phase
+        self.codePadStatusText = Label(
+            self,
+            text="COMPLETED",
+            fg="red",
+            bg="#0077D6",
+            font=("Courier New", 23),
+            anchor="center"
+        )
+        self.codePadStatusText.place(x=540, y=200, width=220, height=60)
+
+        # Title text for toggles phase
+        self.togglesTitleText = Label(
+            self,
+            text="DESTINATION YEAR:",
+            fg="#000000",
+            bg="#0077D6",
+            font=("Courier New", 24),
+            anchor="center"
+        )
+        self.togglesTitleText.place(x=190, y=300, width=520, height=45)
+
+        # Status text for toggles phase
+        self.togglesStatusText = Label(
+            self,
+            text="0 CE",
+            fg="#000000",
+            bg="#0077D6",
+            font=("Courier New", 24),
+            anchor="center"
+        )
+        self.togglesStatusText.place(x=190, y=345, width=520, height=45)
+        
+        # # the timer
+        # self._ltimer = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Time left: ")
+        # self._ltimer.grid(row=1, column=0, columnspan=3, sticky=W)
+        # # the keypad passphrase
+        # self._lkeypad = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Keypad phase: ")
+        # self._lkeypad.grid(row=2, column=0, columnspan=3, sticky=W)
+        # # the jumper wires status
+        # self._lwires = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Wires phase: ")
+        # self._lwires.grid(row=3, column=0, columnspan=3, sticky=W)
+        # # the pushbutton status
+        # self._lbutton = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Button phase: ")
+        # self._lbutton.grid(row=4, column=0, columnspan=3, sticky=W)
+        # # the toggle switches status
+        # self._ltoggles = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Toggles phase: ")
+        # self._ltoggles.grid(row=5, column=0, columnspan=2, sticky=W)
+        # # the strikes left
+        # self._lstrikes = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Strikes left: ")
+        # self._lstrikes.grid(row=5, column=2, sticky=W)
         if (SHOW_BUTTONS):
             # the pause button (pauses the timer)
             self._bpause = tkinter.Button(self, bg="red", fg="white", font=("Courier New", 18), text="Pause", anchor=CENTER, command=self.pause)
@@ -82,16 +215,159 @@ class Lcd(Frame):
         if (RPi):
             self._timer.pause()
 
+    # TODO place a gui element briefly on the screen that tells the user that they have received a strike
+    def strike_display(self):
+        # Assistance in design from https://pydesigner.qzz.io/
+        if self._strikePopup:
+            self._strikePopup.destroy()
+        
+        self._strikePopup = Frame(
+            self,
+            relief="ridge",
+            bg="#0077D6",
+            bd=3
+        )
+        self._strikePopup.place(relx=0.5, rely=0.5, anchor="center")
+        
+        strikeLabel = Label(
+            self._strikePopup,
+            text="You have received a strike!",
+            fg="red",
+            bg="#0077D6",
+            font=("Courier New", 40, "bold"),
+            padx=40,
+            pady=20
+        )
+        strikeLabel.pack()
+        
+        self.after(2000, lambda: strikeLabel.destroy())
+        self.after(2000, lambda: self._strikePopup.destroy())
+
     # setup the conclusion GUI (explosion/defusion)
     def conclusion(self, success=False):
         # destroy/clear widgets that are no longer needed
         self._lscroll["text"] = ""
-        self._ltimer.destroy()
-        self._lkeypad.destroy()
-        self._lwires.destroy()
-        self._lbutton.destroy()
-        self._ltoggles.destroy()
-        self._lstrikes.destroy()
+        self.centerFrame.destroy()
+        self.STRIKES.destroy()
+        self.timeMachineTitle.destroy()
+        self.timeMachineSubtitle.destroy()
+        self.wiresTitleText.destroy()
+        self.wiresStatusText.destroy()
+        self.buttonTitleText.destroy()
+        self.buttonStatusText.destroy()
+        self.codePadTitleText.destroy()
+        self.codePadStatusText.destroy()
+        self.buttonStatusText.destroy()
+        self.togglesTitleText.destroy()
+        self.togglesStatusText.destroy()
+        # self._ltimer.destroy()
+        # self._lkeypad.destroy()
+        # self._lwires.destroy()
+        # self._lbutton.destroy()
+        # self._ltoggles.destroy()
+        # self._lstrikes.destroy()
+        sleep(.5)
+        if success == True: # hyper speed gif & success screen
+            # Assistance was received from ChatGPT 5.1 Codex for gif logic
+            # TODO fix this attempt at getting the gif to work
+            gifFrames = []
+            animating = False
+            frame_idx = 0
+            warpLabel = None
+            
+            while True:
+                try:
+                    frame = PhotoImage(
+                        file="warptravel.gif",
+                        format=f"gif -index {frame_idx}"
+                    )
+                except TclError:
+                    break
+                gifFrames.append(frame)
+                frame_idx += 1
+            
+            warpLabel = Label(self, bg="#000000")
+            warpLabel.place(relx=0.5, rely=0.5, anchor="center")
+            animating = True
+            
+            # animate the gif
+            def animateGif():
+                if (not gifFrames or gifFrames == []) or animating == False:
+                    return 
+                frame = 0
+                current = gifFrames[frame % len(gifFrames)]
+                warpLabel.configure(image=current)
+                warpLabel.image = current
+                self.after(90, animateGif, frame + 1)
+                
+            animateGif()
+                
+            def finalSuccessScreen():
+                animating = False
+                
+                if warpLabel:
+                    warpLabel.destroy()
+                
+                successLabel = Label(
+                    self,
+                    text="You Succeeded!",
+                    fg="#FFDD00",
+                    bg="#0077D6",
+                    font=("Courier New", 48, "bold")    
+                )
+                successLabel.place(relx=0.5, rely=0.5, anchor="center")
+            
+            self.after(3000, finalSuccessScreen)
+            # END Assistance was received from ChatGPT 5.1 Codex for gif logic
+        elif success == False: # explosion gif & failure screen
+            # Assistance was received from ChatGPT 5.1 Codex for gif logic
+            gifFrames = []
+            animating = False
+            frame_idx = 0
+            explosionLabel = None
+            
+            while True:
+                try:
+                    frame = tkinter.PhotoImage(
+                        file="explosion.gif",
+                        format=f"gif -index {frame_idx}"
+                    )
+                except tkinter.TclError:
+                    break
+                gifFrames.append(frame)
+                frame_idx += 1
+            
+            explosionLabel = Label(self, bg="#000000")
+            explosionLabel.place(relx=0.5, rely=0.5, anchor="center")
+            animating = True
+            
+            # animate the gif
+            def animateGif():
+                if (not gifFrames or gifFrames == []) or animating == False:
+                    return 
+                frame = 0
+                current = gifFrames[frame % len(gifFrames)]
+                explosionLabel.configure(image=current)
+                self.after(90, animateGif, frame + 1)
+                
+            def finalFailureScreen():
+                animating = False
+                
+                if explosionLabel:
+                    explosionLabel.destroy()
+                
+                failureLabel = Label(
+                    self,
+                    text="You failed!",
+                    fg="#FFDD00",
+                    bg="#0077D6",
+                    font=("Courier New", 48, "bold")    
+                )
+                failureLabel.place(relx=0.5, rely=0.5, anchor="center")
+            
+            self.after(2000, finalFailureScreen)
+            # END Assistance was received from ChatGPT 5.1 Codex for gif logic
+            
         if (SHOW_BUTTONS):
             self._bpause.destroy()
             self._bquit.destroy()
@@ -99,10 +375,10 @@ class Lcd(Frame):
         # reconfigure the GUI
         # the retry button
         self._bretry = tkinter.Button(self, bg="red", fg="white", font=("Courier New", 18), text="Retry", anchor=CENTER, command=self.retry)
-        self._bretry.grid(row=1, column=0, pady=40)
+        self._bretry.place(relx=0.3, rely=0.7, anchor="center")
         # the quit button
         self._bquit = tkinter.Button(self, bg="red", fg="white", font=("Courier New", 18), text="Quit", anchor=CENTER, command=self.quit)
-        self._bquit.grid(row=1, column=2, pady=40)
+        self._bquit.place(relx=0.7, rely=0.7, anchor="center")
 
     # re-attempts the bomb (after an explosion or a successful defusion)
     def retry(self):
@@ -186,10 +462,6 @@ class Timer(PhaseThread):
     # returns the timer as a string (mm:ss)
     def __str__(self):
         return f"{self._min}:{self._sec}"
-    
-    def reset(self):
-        if (self.value == 1):
-            reset = 
 
 # the keypad phase
 class Keypad(PhaseThread):
@@ -197,31 +469,84 @@ class Keypad(PhaseThread):
         super().__init__(name, component, target)
         # the default value is an empty string
         self._value = ""
+        
+        # Assistance for debounce related items received from ChatGPT 5.1 Codex
+        self._debounce_interval = 0.15  # 100 ms
+        self._last_sample = []
+        self._last_time = 0
+        
+        # target is an array of different steps, so we need to increment through it for each step
+        self._currentTarget = self._target[0]
+        self._currentTargetIndex = 0
+
+    # Assistance for debounce related items received from ChatGPT 5.1 Codex
+    def _stable_keys(self):
+        current = list(self._component.pressed_keys)
+        now = time()
+
+        if current == self._last_sample:
+            if (now - self._last_time) >= self._debounce_interval:
+                return current
+        else:
+            self._last_sample = current
+            self._last_time = now
+        return []
 
     # runs the thread
     def run(self):
         self._running = True
         while (self._running):
-            # process keys when keypad key(s) are pressed
-            if (self._component.pressed_keys):
-                # debounce
-                while (self._component.pressed_keys):
-                    try:
-                        # just grab the first key pressed if more than one were pressed
-                        key = self._component.pressed_keys[0]
-                    except:
-                        key = ""
-                    sleep(0.1)
-                # log the key
+            # debounce
+            print(self._value, self._currentTarget, list(self._component.pressed_keys))
+            # Assistance for debounce related items received from ChatGPT 5.1 Codex
+            stable = self._stable_keys()
+            if stable:
+                key = stable[0]
                 self._value += str(key)
-                # the combination is correct -> phase defused
-                if (self._value == self._target):
-                    self._defused = True
-                # the combination is incorrect -> phase failed (strike)
-                elif (self._value != self._target[0:len(self._value)]):
+                if self._value == self._currentTarget:
+                    self.checkIfDefused()
+                elif self._value != self._currentTarget[:len(self._value)]:
                     self._failed = True
-            sleep(0.1)
-
+                    self.resetTargetIndex()
+                # consume the key so it isn’t re-read on release
+                self._last_sample = []
+            
+#             # process keys when keypad key(s) are pressed
+#             if (self._component.pressed_keys):
+#                 while (self._component.pressed_keys):
+#                     try:
+#                         # just grab the first key pressed if more than one were pressed
+#                         key = self._component.pressed_keys[0]
+#                     except:
+#                         key = ""
+#                     sleep(0.1)
+#                 # log the key
+#                 self._value += str(key)
+#                 # the combination is correct -> phase defused
+#                 if (self._value == self._currentTarget):
+#                     self.checkIfDefused()
+#                 # the combination is incorrect -> phase failed (strike) 
+#                 elif (self._value != self._currentTarget[0:len(self._value)]):
+#                     self._failed = True
+#                     self.resetTargetIndex()
+            sleep(0.01)
+    
+    def checkIfDefused(self):
+        if self._currentTargetIndex == len(self._target) - 1: # final code has been entered properly
+            self._defused = True
+        else:
+            self.incrementTargetIndex()
+            
+    def incrementTargetIndex(self):
+        self._currentTargetIndex += 1
+        self._currentTarget = self._target[self._currentTargetIndex]
+        self._value = ""
+    
+    def resetTargetIndex(self):
+        self._currentTargetIndex = 0
+        self._currentTarget = self._target[self._currentTargetIndex]
+        self._value = ""
+    
     # returns the keypad combination as a string
     def __str__(self):
         if (self._defused):
@@ -233,64 +558,105 @@ class Keypad(PhaseThread):
 class Wires(PhaseThread):
     def __init__(self, component, target, name="Wires"):
         super().__init__(name, component, target)
+        self._value = "11111"
+#         self._lastValue = ""
 
     # runs the thread
     def run(self):
-        # TODO
-        pass
-
+        self._running = True
+        while (True):
+            # get the jumper wire states (0->False, 1->True)
+            self._value = "".join([str(int(pin.value)) for pin in self._component])
+            self.checkIfDefused()
+            sleep(0.1)
+        self._running = False
+        
+    def checkIfDefused(self):
+#         if self._lastValue == "" and self._value != "": # make sure lastValue is set to something
+#             self._lastValue == self._value
+        
+        if self._value == self._target:
+            self._defused = True
+        elif self._value != self._target and self._value != "11111":
+            print(self._value,self._target)
+            self._failed = True # immediately fail, added in bomb.py logic
+        
     # returns the jumper wires state as a string
     def __str__(self):
         if (self._defused):
             return "DEFUSED"
         else:
-            # TODO
-            pass
+            return self._value
 
 # the pushbutton phase
 class Button(PhaseThread):
     def __init__(self, component_state, component_rgb, target, color, timer, name="Button"):
         super().__init__(name, component_state, target)
-        # the default value is False/Released
-        self._value = False
-        # has the pushbutton been pressed?
+        # the default value is number of times the button has been pressed
+        self._value = 0
+        # has the pushbutton been pressed before?
         self._pressed = False
+        # when was the time since epoch that the pushbutton was last pressed?
+        self._lastPressed = 0
         # we need the pushbutton's RGB pins to set its color
         self._rgb = component_rgb
-        # the pushbutton's randomly selected LED color
+        # the pushbutton's randomly selected LED color list
         self._color = color
         # we need to know about the timer (7-segment display) to be able to determine correct pushbutton releases in some cases
         self._timer = timer
+        # debounce variable
+        # Assistance for debounce related items received from ChatGPT 5.1 Codex
+        self._last_button_press_time = 0
 
     # runs the thread
     def run(self):
+        Thread(target=self.updateButtonColor, daemon=True).start() # start flashing the Button LED based on the LED combo
+        
         self._running = True
-        # set the RGB LED color
-        self._rgb[0].value = False if self._color == "R" else True
-        self._rgb[1].value = False if self._color == "G" else True
-        self._rgb[2].value = False if self._color == "B" else True
         while (self._running):
             # get the pushbutton's state
-            self._value = self._component.value
+#             self._value = self
+            
             # it is pressed
-            if (self._value):
-                # note it
-                self._pressed = True
-            # it is released
-            else:
+            if (self._component.value):
+                # Assistance for debounce related items received from ChatGPT 5.1 Codex
+                now = time()
+                if (now - self._last_button_press_time) >= .3:
+                    self._pressed = True
+                    self._lastPressed = now
+                    self._last_button_press_time = now
+                    self._value += 1
+                    print(self._value, self._target)
+            else: # it is released
                 # was it previously pressed?
-                if (self._pressed):
+                # has it also been two seconds since it was last pressed?
+                if (self._pressed and (time() - self._lastPressed) >= 2):
                     # check the release parameters
-                    # for R, nothing else is needed
-                    # for G or B, a specific digit must be in the timer (sec) when released
-                    if (not self._target or self._target in self._timer._sec):
+                    # 
+                    if (not self._target or self._target == self._value):
                         self._defused = True
                     else:
                         self._failed = True
                     # note that the pushbutton was released
                     self._pressed = False
-            sleep(0.1)
-
+            sleep(0.15)
+    
+    def updateButtonColor(self):
+        while True:
+            for pin in self._rgb: # turn back on button rgb
+                pin.value = False
+        
+            for color in self._color:
+                self._rgb[0].value = False if color == "R" else True
+                self._rgb[1].value = False if color == "G" else True
+                self._rgb[2].value = False if color == "B" else True
+                sleep(.5)
+            
+            for pin in self._rgb: # turn off button rgb
+                pin.value = True
+                
+            sleep(2)
+        
     # returns the pushbutton's state as a string
     def __str__(self):
         if (self._defused):
@@ -302,16 +668,42 @@ class Button(PhaseThread):
 class Toggles(PhaseThread):
     def __init__(self, component, target, name="Toggles"):
         super().__init__(name, component, target)
+        self._value = ""
 
     # runs the thread
     def run(self):
-        # TODO
-        pass
+        self._running = True
+        while (True):
+            # get the toggle switch value(0->False, 1->True)
+            self._value = "".join([str(int(pin.value)) for pin in self._component])
+            self.checkIfDefused()
+            sleep(0.1)
+        self._running = False
+        
+    def convertToYear(self): # used in bomb.py to display final #
+        # 1 is - 1013, 2 is + 338, 3 is *2, 4 is absolute value
+        finalValue = "0"
+        if self._value[0] == "1":
+            finalValue = str(int(finalValue) - 1013)
+        
+        if self._value[1] == "1":
+            finalValue = str(int(finalValue) + 338)
+        
+        if self._value[2] == "1":
+            finalValue = str(int(finalValue) * 2)
+        
+        if self._value[3] == "1":
+            finalValue = str(abs(int(finalValue)))
+        
+        return finalValue
+    
+    def checkIfDefused(self):
+        if self._value == self._target:
+            self._defused = True
 
     # returns the toggle switches state as a string
     def __str__(self):
         if (self._defused):
             return "DEFUSED"
         else:
-            # TODO
-            pass
+            return f"{self._value}/{int(self._value, 2)}"
