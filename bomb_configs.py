@@ -97,7 +97,19 @@ def genTogglesTarget():
     return "1011"
 
 def genWiresTarget():
-    return "11101"
+    if button_color == ["R", "G", "B"]:
+        return '01111'
+    if button_color == ["R", "B", "G"]:
+        return '10111'
+    if button_color == ["G", "R", "B"]:
+        return '11011'
+    if button_color == ["G", "B", "R"]:
+        return '11101'
+    if button_color == ["B", "R", "G"]:
+        return '11110'
+    if button_color == ["B", "G", "R"]:
+       return '11110'
+    
 
 # generates the keypad combination from a keyword and rotation key
 def genKeypadTarget():
