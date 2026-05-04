@@ -91,6 +91,9 @@ if (RPi):
 #     # TODO
 #     return "B026DES"
 
+# generate the color of the pushbutton (which determines how to defuse the phase)
+button_color = sample(["R", "G", "B"], 3) # shuffles the possible combinations ex: ["B","R","G"]. 6 possible permutations
+
 def genTogglesTarget():
     # Actual target will be "2026" after mathematical conversion
     # 1 is - 1013, 2 is + 338, 3 is *2, 4 is absolute value
@@ -101,10 +104,19 @@ def genWiresTarget():
 
 # generates the keypad combination from a keyword and rotation key
 def genKeypadTarget():
-    return ["1776", "1945"]
+    # (CHANGE) Solution function for each possible permutation
+    global button_color
+    
+    pattern_map = {
+        ("R", "G", "B"): ["1776", "1896", "1969", "2009"],
+        ("R", "B", "G"): ["1776", "1969", "1896", "2009"],
+        ("G", "R", "B"): ["1896", "1776", "1969", "2009"],
+        ("G", "B", "R"): ["1896", "1969", "1776", "2009"],
+        ("B", "R", "G"): ["1969", "1776", "1896", "2009"],
+        ("B", "G", "R"): ["1969", "1896", "1776", "2009"],    
+    }
 
-# generate the color of the pushbutton (which determines how to defuse the phase)
-button_color = sample(["R", "G", "B"], 3) # shuffles the possible combinations ex: ["B","R","G"]. 6 possible permutations
+    return pattern_map[button_color]
 
 def genButtonTarget():
     # TODO
