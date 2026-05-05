@@ -117,7 +117,11 @@ def check_phases():
     # check the toggles
     if (toggles._running):
         # update the GUI
-        gui.togglesStatusText["text"] = f"{toggles.convertToYear()} CE"
+        updatedYear = toggles.convertToYear()
+        if abs(updatedYear) == updatedYear:
+            gui.togglesStatusText["text"] = f"{updatedYear} CE"
+        else:
+            gui.togglesStatusText["text"] = f"{abs(updatedYear)} BCE"
         # the phase is defused -> stop the thread
         if (toggles._defused):
             gui.togglesStatusText["fg"] = "green"
