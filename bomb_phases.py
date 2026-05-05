@@ -650,21 +650,65 @@ class Toggles(PhaseThread):
         self._running = False
         
     def convertToYear(self): # used in bomb.py to display final #
-        # 1 is - 1013, 2 is + 338, 3 is *2, 4 is absolute value
-        finalValue = "0"
+        # Assistance was received from ChatGPT 5.1 Codex for year conversion logic
+        operations = {"abs": False, "x2": False}
+        finalValue = 0
+
+        # Work out which index should receive each behavior.
+        slot_order = sorted(range(4), key=lambda idx: self._target[idx])
+        add_slot, sub_slot, x2_slot, abs_slot = slot_order
+    
+        # Slot 0
         if self._value[0] == "1":
-            finalValue = str(int(finalValue) - 1013)
-        
+            if 0 == add_slot:
+                finalValue += 338
+            elif 0 == sub_slot:
+                finalValue -= 1013
+            elif 0 == x2_slot:
+                operations["x2"] = True
+            elif 0 == abs_slot:
+                operations["abs"] = True
+    
+        # Slot 1
         if self._value[1] == "1":
-            finalValue = str(int(finalValue) + 338)
-        
+            if 1 == add_slot:
+                finalValue += 338
+            elif 1 == sub_slot:
+                finalValue -= 1013
+            elif 1 == x2_slot:
+                operations["x2"] = True
+            elif 1 == abs_slot:
+                operations["abs"] = True
+    
+        # Slot 2
         if self._value[2] == "1":
-            finalValue = str(int(finalValue) * 2)
-        
+            if 2 == add_slot:
+                finalValue += 338
+            elif 2 == sub_slot:
+                finalValue -= 1013
+            elif 2 == x2_slot:
+                operations["x2"] = True
+            elif 2 == abs_slot:
+                operations["abs"] = True
+    
+        # Slot 3
         if self._value[3] == "1":
-            finalValue = str(abs(int(finalValue)))
-        
-        return finalValue
+            if 3 == add_slot:
+                finalValue += 338
+            elif 3 == sub_slot:
+                finalValue -= 1013
+            elif 3 == x2_slot:
+                operations["x2"] = True
+            elif 3 == abs_slot:
+                operations["abs"] = True
+    
+        if operations["abs"]:
+            finalValue = abs(finalValue)
+        if operations["x2"]:
+            finalValue *= 2
+    
+        return str(finalValue)
+        # END Assistance was received from ChatGPT 5.1 Codex for year conversion logic
     
     def checkIfDefused(self):
         if self._value == self._target:
