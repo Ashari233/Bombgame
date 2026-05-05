@@ -650,19 +650,37 @@ class Toggles(PhaseThread):
         self._running = False
         
     def convertToYear(self): # used in bomb.py to display final #
-        # 1 is - 1013, 2 is + 338, 3 is *2, 4 is absolute value
+        operations = {"abs": False, "x2": False}
         finalValue = "0"
-        if self._value[0] == "1":
+        if self._value[0] == "1" and self._target[0] == "1":
             finalValue = str(int(finalValue) - 1013)
-        
-        if self._value[1] == "1":
+        elif self._value[0] == "1":
             finalValue = str(int(finalValue) + 338)
         
-        if self._value[2] == "1":
-            finalValue = str(int(finalValue) * 2)
+        if self._value[1] == "1" and self._target[1] == "1":
+            finalValue = str(int(finalValue) + 338)
+        elif self._value[0] == "1" and self._target[0] == "0":
+            finalValue = str(int(finalValue) - 1013)
+        elif self._value[0] == "1" and self._target[2] == "0":
+            operations["x2"] = True
+        elif self._value[0] == "1" and self._target[3] == "0":
+            operations["abs"] = True
         
-        if self._value[3] == "1":
-            finalValue = str(abs(int(finalValue)))
+        if self._value[2] == "1" and self._target[2] == "1":
+            operations["x2"] = True
+        elif self._value[2] == "1":
+            finalValue = str(int(finalValue) + 338)
+        
+        if self._value[3] == "1" and self._target[3] == "1":
+            operations["abs"] = True
+        elif self._value[3] == "1":
+            finalValue = str(int(finalValue) + 338)
+
+        if operations["abs"] == True:
+            finalValue = str(int(finalValue) * 2)
+
+        if operations["x2"] == True:
+            finalValue = str(int(finalValue) * 2)
         
         return finalValue
     
