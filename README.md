@@ -11,5 +11,5 @@ You are inside a broken time machine. The machine appears to be wired incorrectl
 Instructions can be found in /docs/
 
 ### Sources
-explosion.gif - [link](https://akrisztina27.blogspot.com/2021/07/explosion-transparent-gif.html)
+explosion.gif - [link](https://akrisztina27.blogspot.com/2021/07/explosion-transparent-gif.html)  
 warptravel.gif - [link](https://web.archive.org/web/20231124140309/https://yourphotosleague.blogspot.com/2021/08/star-wars-gif-background-for-zoom.html)
