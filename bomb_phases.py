@@ -9,6 +9,7 @@ from bomb_configs import *
 # other imports
 from tkinter import *
 import tkinter
+from PIL import Image, ImageTk, ImageSequence
 from threading import Thread
 from time import sleep, time
 import os
@@ -45,7 +46,6 @@ class Lcd(Frame):
 
     # sets up the LCD GUI
     def setup(self):
-        # Assistance in design received from https://pydesigner.qzz.io/
         # Centering Frame for phase statuses
         self.centerFrame = Frame(
             self,
@@ -163,7 +163,7 @@ class Lcd(Frame):
             font=("Courier New", 24),
             anchor="center"
         )
-        self.togglesTitleText.place(x=190, y=300, width=520, height=45)
+        self.togglesTitleText.place(relx=0.5, y=300, width=520, height=45, anchor="n")
 
         # Status text for toggles phase
         self.togglesStatusText = Label(
@@ -174,7 +174,7 @@ class Lcd(Frame):
             font=("Courier New", 24),
             anchor="center"
         )
-        self.togglesStatusText.place(x=190, y=345, width=520, height=45)
+        self.togglesStatusText.place(relx=0.5, y=345, width=520, height=45, anchor="n")
         
         # # the timer
         # self._ltimer = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Time left: ")
@@ -217,7 +217,6 @@ class Lcd(Frame):
 
     # TODO place a gui element briefly on the screen that tells the user that they have received a strike
     def strike_display(self):
-        # Assistance in design from https://pydesigner.qzz.io/
         if self._strikePopup:
             self._strikePopup.destroy()
         
@@ -242,6 +241,20 @@ class Lcd(Frame):
         
         self.after(2000, lambda: strikeLabel.destroy())
         self.after(2000, lambda: self._strikePopup.destroy())
+    
+    # Assistance was received from ChatGPT 5.1 Codex for gif logic
+    def _load_gif_frames(self, path):
+        try:
+            gif = Image.open(path)
+        except (OSError, FileNotFoundError):
+            return []
+
+        frames = []
+        for frame in ImageSequence.Iterator(gif):
+            frames.append(ImageTk.PhotoImage(frame.copy()))
+        gif.close()
+        return frames
+    # END Assistance was received from ChatGPT 5.1 Codex for gif logic
 
     # setup the conclusion GUI (explosion/defusion)
     def conclusion(self, success=False):
@@ -267,107 +280,63 @@ class Lcd(Frame):
         # self._ltoggles.destroy()
         # self._lstrikes.destroy()
         sleep(.5)
-        if success == True: # hyper speed gif & success screen
+        if success:
             # Assistance was received from ChatGPT 5.1 Codex for gif logic
-            # TODO fix this attempt at getting the gif to work
-            gifFrames = []
-            animating = False
-            frame_idx = 0
-            warpLabel = None
-            
-            while True:
-                try:
-                    frame = PhotoImage(
-                        file="warptravel.gif",
-                        format=f"gif -index {frame_idx}"
-                    )
-                except TclError:
-                    break
-                gifFrames.append(frame)
-                frame_idx += 1
-            
-            warpLabel = Label(self, bg="#000000")
-            warpLabel.place(relx=0.5, rely=0.5, anchor="center")
-            animating = True
-            
-            # animate the gif
-            def animateGif():
-                if (not gifFrames or gifFrames == []) or animating == False:
-                    return 
-                frame = 0
-                current = gifFrames[frame % len(gifFrames)]
-                warpLabel.configure(image=current)
-                warpLabel.image = current
-                self.after(90, animateGif, frame + 1)
-                
-            animateGif()
-                
+            warp_frames = self._load_gif_frames("warptravel.gif")
+            warp_label = Label(self, bg="#000000")
+            warp_label.place(relx=0.5, rely=0.5, anchor="center")
+
+            def animate(frame_idx=0):
+                if not warp_frames:
+                    return
+                frame = warp_frames[frame_idx % len(warp_frames)]
+                warp_label.configure(image=frame)
+                warp_label.image = frame
+                self.after(90, animate, frame_idx + 1)
+
+            animate()
+
             def finalSuccessScreen():
-                animating = False
-                
-                if warpLabel:
-                    warpLabel.destroy()
-                
-                successLabel = Label(
+                warp_label.destroy()
+                Label(
                     self,
                     text="You Succeeded!",
-                    fg="#FFDD00",
+                    fg="green",
                     bg="#0077D6",
-                    font=("Courier New", 48, "bold")    
-                )
-                successLabel.place(relx=0.5, rely=0.5, anchor="center")
-            
+                    font=("Courier New", 48, "bold")
+                ).place(relx=0.5, rely=0.5, anchor="center")
+
             self.after(3000, finalSuccessScreen)
             # END Assistance was received from ChatGPT 5.1 Codex for gif logic
         elif success == False: # explosion gif & failure screen
             # Assistance was received from ChatGPT 5.1 Codex for gif logic
-            gifFrames = []
-            animating = False
-            frame_idx = 0
-            explosionLabel = None
-            
-            while True:
-                try:
-                    frame = tkinter.PhotoImage(
-                        file="explosion.gif",
-                        format=f"gif -index {frame_idx}"
-                    )
-                except tkinter.TclError:
-                    break
-                gifFrames.append(frame)
-                frame_idx += 1
-            
-            explosionLabel = Label(self, bg="#000000")
-            explosionLabel.place(relx=0.5, rely=0.5, anchor="center")
-            animating = True
-            
-            # animate the gif
-            def animateGif():
-                if (not gifFrames or gifFrames == []) or animating == False:
-                    return 
-                frame = 0
-                current = gifFrames[frame % len(gifFrames)]
-                explosionLabel.configure(image=current)
-                self.after(90, animateGif, frame + 1)
-                
-            def finalFailureScreen():
-                animating = False
-                
-                if explosionLabel:
-                    explosionLabel.destroy()
-                
-                failureLabel = Label(
+            warp_frames = self._load_gif_frames("explosion.gif")
+            warp_label = Label(self, bg="#000000")
+            warp_label.place(relx=0.5, rely=0.5, anchor="center")
+
+            def animate(frame_idx=0):
+                if not warp_frames:
+                    return
+                frame = warp_frames[frame_idx % len(warp_frames)]
+                warp_label.configure(image=frame)
+                warp_label.image = frame
+                self.after(90, animate, frame_idx + 1)
+
+            animate()
+
+            def finalSuccessScreen():
+                warp_label.destroy()
+                Label(
                     self,
-                    text="You failed!",
-                    fg="#FFDD00",
+                    text="You Failed!",
+                    fg="red",
                     bg="#0077D6",
-                    font=("Courier New", 48, "bold")    
-                )
-                failureLabel.place(relx=0.5, rely=0.5, anchor="center")
-            
-            self.after(2000, finalFailureScreen)
+                    font=("Courier New", 48, "bold")
+                ).place(relx=0.5, rely=0.5, anchor="center")
+
+            self.after(3000, finalSuccessScreen)
             # END Assistance was received from ChatGPT 5.1 Codex for gif logic
-            
+        
         if (SHOW_BUTTONS):
             self._bpause.destroy()
             self._bquit.destroy()
@@ -707,3 +676,4 @@ class Toggles(PhaseThread):
             return "DEFUSED"
         else:
             return f"{self._value}/{int(self._value, 2)}"
+
