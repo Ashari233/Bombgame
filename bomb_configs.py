@@ -128,7 +128,18 @@ def genWiresTarget():
 
 # generates the keypad combination from a keyword and rotation key
 def genKeypadTarget():
-    return ["1776", "1945"]
+    global button_color
+    
+    pattern_map = {
+        ["R", "G", "B"]: ["1776", "1896", "1969", "2009"],
+        ["R", "B", "G"]: ["1776", "1969", "1896", "2009"],
+        ["G", "R", "B"]: ["1896", "1776", "1969", "2009"],
+        ["G", "B", "R"]: ["1896", "1969", "1776", "2009"],
+        ["B", "R", "G"]: ["1969", "1776", "1896", "2009"],
+        ["B", "G", "R"]: ["1969", "1896", "1776", "2009"],    
+    }
+
+    return pattern_map[button_color]
 
 def genButtonTarget():
     global button_color
