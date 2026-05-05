@@ -91,6 +91,9 @@ if (RPi):
 #     # TODO
 #     return "B026DES"
 
+# generate the color of the pushbutton (which determines how to defuse the phase)
+button_color = sample(["R", "G", "B"], 3) # shuffles the possible combinations ex: ["B","R","G"]. 6 possible permutations
+
 def genTogglesTarget():
     # Actual target will be "2026" after mathematical conversion
     # 1 is - 1013, 2 is + 338, 3 is *2, 4 is absolute value
@@ -115,23 +118,20 @@ def genWiresTarget():
 def genKeypadTarget():
     return ["1776", "1945"]
 
-# generate the color of the pushbutton (which determines how to defuse the phase)
-button_color = sample(["R", "G", "B"], 3) # shuffles the possible combinations ex: ["B","R","G"]. 6 possible permutations
-
 def genButtonTarget():
-    # TODO
     global button_color
-    # Create your own logic of making a Button target
-    # appropriately set the target (R is None)
-#     b_target = None
-#     # G is the first numeric digit in the serial number
-#     if (button_color == "G"):
-# #         b_target = [ n for n in serial if n.isdigit() ][0]
-#     # B is the last numeric digit in the serial number
-#     elif (button_color == "B"):
-# #         b_target = [ n for n in serial if n.isdigit() ][-1]
-            
-    return 2
+    if button_color == ["R","G","B"]:
+        return 1
+    elif button_color == ["R", "B", "G"]:
+        return 2
+    elif button_color == ["G", "R", "B"]:
+        return 3
+    elif button_color == ["G", "B", "R"]:
+        return 4
+    elif button_color == ["B", "R", "G"]:
+        return 5
+    elif button_color == ["B", "G", "R"]:
+        return 6
 
 ###############################
 # serial = genSerial()
