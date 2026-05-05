@@ -6,7 +6,7 @@
 
 
 ## Description
-You are inside a broken time machine. The machine appears to be wired incorrectly. You must fix the phases to return the machine to a functional state. The time machine will “explode” when its countdown reaches 0:00 or when the player has run out of strikes. You must defuse the bomb by disarming all the phases to repair the time machine before time runs out! 
+You are inside a broken time machine. The machine appears to be wired incorrectly. You must fix the phases to return the machine to a functional state. The time machine will “explode” when its countdown reaches 00:00 or when the player has run out of strikes. You must defuse the bomb by disarming all the phases to repair the time machine before time runs out! 
 
 Instructions can be found in /docs/
 
