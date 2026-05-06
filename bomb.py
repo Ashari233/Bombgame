@@ -70,7 +70,7 @@ def check_phases():
     if (keypad._running):
         # update the GUI
 #         gui._lkeypad["text"] = f"Combination: {keypad}"
-        # the phase is defused -> stop the thread
+        # the phase is defused -> stop the thread and set the result color to green
         if (keypad._defused):
             keypad._running = False
             active_phases -= 1
@@ -86,7 +86,7 @@ def check_phases():
 #         print(str(wires))
         # update the GUI
 #         gui._lwires["text"] = f"Wires: {wires}"
-        # the phase is defused -> stop the thread
+        # the phase is defused -> stop the thread and set the result color to green
         if (wires._defused):
             wires._running = False
             active_phases -= 1
@@ -101,7 +101,7 @@ def check_phases():
     if (button._running):
         # update the GUI
 #         gui._lbutton["text"] = f"Button: {button}"
-        # the phase is defused -> stop the thread
+        # the phase is defused -> stop the thread and set the result color to green
         if (button._defused):
             button._running = False
             active_phases -= 1
@@ -116,13 +116,13 @@ def check_phases():
             button._failed = False
     # check the toggles
     if (toggles._running):
-        # update the GUI
+        # update the GUI text value based on current toggle value
         updatedYear = toggles.convertToYear()
-        if abs(int(updatedYear)) == int(updatedYear):
+        if abs(int(updatedYear)) == int(updatedYear): # if the value is positive, use CE
             gui.togglesStatusText["text"] = f"{updatedYear} CE"
         else:
-            gui.togglesStatusText["text"] = f"{abs(int(updatedYear))} BCE"
-        # the phase is defused -> stop the thread
+            gui.togglesStatusText["text"] = f"{abs(int(updatedYear))} BCE" # if the value is negative, use BCE
+        # the phase is defused -> stop the thread and set the result color to green
         if (toggles._defused):
             gui.togglesStatusText["fg"] = "green"
             toggles._running = False
@@ -157,7 +157,8 @@ def check_phases():
 # handles a strike
 def strike(endGame=False):
     global strikes_left
-    
+
+    # allow immediate ending of the game if passed value is True (used for the wires phase)
     if endGame == True:
         strikes_left = 0
         return
