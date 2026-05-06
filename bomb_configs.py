@@ -96,8 +96,8 @@ button_color = sample(["R", "G", "B"], 3) # shuffles the possible combinations e
 
 def genTogglesTarget():
     global button_color
-    
     # Actual target will be "2026" after mathematical conversion
+    # Return binary representation of the toggles solution based on the pattern displayed on the button rgb light
     if button_color == ["R", "G", "B"]:
         return "1110"
     elif button_color == ["R", "B", "G"]:
@@ -113,6 +113,7 @@ def genTogglesTarget():
     
 def genWiresTarget():
     global button_color
+    # Return binary representation of the wire solution based on the pattern displayed on the button rgb light
     if button_color == ["R", "G", "B"]:
         return '01111'
     if button_color == ["R", "B", "G"]:
@@ -129,6 +130,7 @@ def genWiresTarget():
 # generates the keypad combination from a keyword and rotation key
 def genKeypadTarget():
     global button_color
+    # Return an array of the keypad solution with four years in varying orders based on the pattern displayed on the button rgb light
     if button_color == ["R", "G", "B"]:
         return ["1776", "1896", "1969", "2009"]
     if button_color == ["R", "B", "G"]:
@@ -144,6 +146,7 @@ def genKeypadTarget():
 
 def genButtonTarget():
     global button_color
+    # Return the number of times the button has to be pressed as the solution based on the pattern displayed on the button rgb light
     if button_color == ["R","G","B"]:
         return 1
     elif button_color == ["R", "B", "G"]:
@@ -165,5 +168,6 @@ keypad_target = genKeypadTarget()
 button_target = genButtonTarget()
 
 # set the bomb's LCD bootup text
+# deprecated
 boot_text = "Yay!"
             
